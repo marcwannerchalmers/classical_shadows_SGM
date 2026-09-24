@@ -297,7 +297,7 @@ experiments.
 ## Documentation
 
 The published documentation is available at
-[docs.sgm-shadows.com](https://docs.sgm-shadows.com/).
+[marcwannerchalmers.github.io/classical_shadows_SGM/](https://marcwannerchalmers.github.io/classical_shadows_SGM/).
 
 Install the static documentation toolchain separately from the scientific
 runtime dependencies:
