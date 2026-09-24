@@ -148,3 +148,33 @@ class GHZType(State):
             self.xy,
             tableau,
         )
+
+def GHZ_Klocal(locality: int) -> type[GHZType]:
+    """Create a GHZ state class with a fixed number of active qubits.
+
+    Args:
+        locality: Number of randomly positioned active qubits in each state.
+
+    Returns:
+        A dynamically defined `GHZType` subclass suitable for an experiment.
+
+    Raises:
+        ValueError: When a generated state's qubit count is smaller than the
+            requested locality.
+    """
+
+    class KLocalGHZ(GHZType):
+        @classmethod
+        def init_random(cls, key: Array, N_state: int, n: int) -> State:
+            if not 1 <= locality <= n:
+                raise ValueError("GHZ locality must satisfy 1 <= locality <= n")
+            key_blocks, key_xy = random.split(key)
+            priorities = random.uniform(key_blocks, (N_state, n), dtype=jnp.float32)
+            active = jnp.argsort(priorities, axis=1)[:, :locality]
+            blocks = jnp.zeros((N_state, n), dtype=jnp.int32)
+            blocks = blocks.at[jnp.arange(N_state)[:, None], active].set(1)
+            xy = random.randint(key_xy, (N_state,), 0, 2, dtype=jnp.int32)
+            return cls.init(blocks, xy)
+
+    KLocalGHZ.__name__ = f"GHZ_{locality}local"
+    return KLocalGHZ
