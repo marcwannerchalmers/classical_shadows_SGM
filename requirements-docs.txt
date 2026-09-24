@@ -1,0 +1,5 @@
+# Documentation toolchain. Runtime dependencies are intentionally omitted:
+# Griffe and mkdocstrings analyze the source tree without importing it.
+zensical==0.0.63
+mkdocstrings-python==2.0.5
+griffe==2.3.0

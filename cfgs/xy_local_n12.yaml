@@ -1,0 +1,97 @@
+defaults:
+  - _self_
+
+name: xy_local_paulis
+seed: 12345
+n: 12
+k: 11
+
+# ``values``, ``range`` and ``powers`` are supported for both axes.
+qubits:
+  values: ["${n}"]
+samples:
+  powers:
+    base: 2
+    start: 7
+    stop: 21  # exclusive: 2^7, ..., 2^20
+
+repetitions: 10
+state:
+  class: HRState
+  name: HR_state
+
+observables:
+  init: random  # alternatively: {init: file, path: observables.npy}
+  count: 500
+  sample_indices: [X, Y]
+  k_local: ${k}
+  padding_indices: [I, Z]
+
+batch:
+  states: 1
+  observables: 50
+  samples: 256
+
+experiments:
+  - id: clifford
+    shadow_class: CliffordShadow
+    shadow_args:
+      simulator: statevector
+    experiment_name: Clifford
+    path_prefix: results/CliffordEx_nmax12_Nobs500_reps10_N1048576_k11_bsState1_bsObs50_bsN256
+    verbose: true
+
+  - id: sgm_uniform
+    shadow_class: SGMShadow
+    shadow_args:
+      simulator: statevector
+    experiment_name: SGM uniform
+    path_prefix: results/SGMEx1_nmax12_Nobs500_reps10_N1048576_k11_bsState1_bsObs50_bsN256
+    verbose: true
+
+  - id: pauli
+    shadow_class: PauliShadow
+    shadow_args:
+      simulator: statevector
+    experiment_name: Pauli
+    path_prefix: results/PauliEx_nmax12_Nobs500_reps10_N1048576_k11_bsState1_bsObs50_bsN256
+    verbose: true
+
+  - id: sgm_binomial
+    shadow_class: SGMShadow
+    shadow_args:
+      simulator: statevector
+      distribution:
+        name: binomial
+        q: ${eval:'${k}/${n}'}
+      # Optional stochastic Pauli noise would be written as:
+      # noise: {name: depolarizing, p: 0.1}
+    experiment_name: SGM binomial
+    path_prefix: results/SGMEx2_q11of12_nmax12_Nobs500_reps10_N1048576_k11_bsState1_bsObs50_bsN256
+    verbose: true
+
+plot:
+  enabled: true
+  function: plot_avg_var
+  path: plots/scaling_batched_n12_Nobs500_reps10.pdf
+  x: N
+  xlog: true
+  ylog: true
+  metric: rmse
+  aggregation_batch_size: 16
+  progress: true
+  style:
+    font_sizes: {axes: 15, ticks: 15, legend: 14, legend_title: 14}
+    marker_size: 8
+    line_width: 2
+    legend_location: upper right
+    aspect_ratio: 1.2
+    x_tick_stride: 2
+
+# Keep paths relative to the repository rather than a Hydra output directory.
+hydra:
+  run:
+    dir: .
+  output_subdir: null
+  job:
+    chdir: false

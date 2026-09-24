@@ -1,0 +1,123 @@
+defaults:
+  - _self_
+
+name: arrhenius_random_GHZ
+seed: 12345
+nmin: 5
+nmax_exclusive: 55
+n_step: 5
+k: 3
+N: 2097152
+
+qubits:
+  range:
+    start: ${nmin}
+    stop: ${nmax_exclusive}
+    step: ${n_step}
+
+samples:
+  range: 
+    start: 4096
+    stop: ${eval:'${N}+1'}
+    step: 4096
+repetitions: 10
+
+state:
+  class: GHZType
+  name: GHZ_state
+
+# These defaults are overridden by the locality sweep below.
+observables:
+  init: random
+  count: 50
+  sample_indices: [X, Y]
+  padding_indices: [I, Z]
+
+batch:
+  states: 1
+  observables: 50
+  samples: 1024
+
+experiments:
+  - id: sgm_ghz_locality
+    for_each:
+      variable: offset
+      range: 
+        start: 1
+        stop: ${eval:'${k} + 1'}
+    shadow_class: SGMShadow
+    observables:
+      k_local: ${eval:'${n}-${offset}'}
+    shadow_args:
+      simulator: clifford
+      distribution: 
+        name: binomial
+        q: ${eval:'(${n} - ${offset}) / ${n}'}
+    experiment_name: SGM binomial q=(n-offset)/n; Z/I locality ${offset}
+    path_prefix: results/SGMGHZ_xy_nmax${nmax_exclusive}_Nobs${observables.count}_reps${repetitions}_N${N}_k${offset}
+    verbose: true
+  - id: pauli_ghz_locality
+    for_each:
+      variable: offset
+      range: 
+        start: 1 
+        stop: 2 #${eval:'${k} + 1'}
+    shadow_class: PauliShadow
+    observables:
+      k_local: ${eval:'${n}-${offset}'}
+    qubits:
+      range:
+        start: ${nmin}
+        stop: 25
+        step: ${n_step}
+    shadow_args:
+      simulator: clifford
+    experiment_name: Pauli; Z/I locality ${offset}
+    path_prefix: results/PauliGHZ_xy_nmax25_Nobs${observables.count}_reps${repetitions}_N${N}_k${offset}
+    verbose: true
+  - id: clifford_ghz_locality
+    for_each:
+      variable: offset
+      range: 
+        start: 1
+        stop: 2 # ${eval:'${k} + 1'}
+    shadow_class: CliffordShadow
+    qubits:
+      range:
+        start: ${nmin}
+        stop: 25
+        step: ${n_step}
+    observables:
+      k_local: ${eval:'${n}-${offset}'}
+    shadow_args:
+      simulator: clifford
+    experiment_name: Clifford; Z/I locality ${offset}
+    path_prefix: results/CliffordGHZ_xy_nmax25_Nobs${observables.count}_reps${repetitions}_N${N}_k${offset}
+    verbose: true
+
+plot:
+  function: plot_sample_complexity
+  epsilon: 0.1
+  path: plots/GHZ_sample_complexity_eps${plot.epsilon}_nmax${nmax_exclusive}_Nobs${observables.count}_reps${repetitions}_N${N}.pdf
+  x: n
+  xlog: true
+  ylog: true
+  metric: rmse
+  remove_zero_predictions: true
+  aggregation_batch_size: 16
+  progress: true
+  style:
+    font_sizes: {axes: 15, ticks: 15, legend: 14, legend_title: 14}
+    marker_size: 8
+    line_width: 2
+    legend_location: best
+    aspect_ratio: 1.8
+  name_dict:
+    SGM binomial q=(n-offset)/n; Z/I locality 1: SGM binomial q=(n-1)/n; Z/I locality 1
+    SGM binomial q=(n-offset)/n; Z/I locality 2: SGM binomial q=(n-2)/n; Z/I locality 2
+    SGM binomial q=(n-offset)/n; Z/I locality 3: SGM binomial q=(n-3)/n; Z/I locality 3
+
+hydra:
+  run: {dir: .}
+  output_subdir: null
+  job: {chdir: false}

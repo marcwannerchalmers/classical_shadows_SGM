@@ -1,0 +1,45 @@
+name: Documentation
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install documentation dependencies
+        run: python -m pip install -r requirements-docs.txt
+
+      - name: Verify static API analysis
+        shell: bash
+        run: |
+          docs_modules=(
+            run_experiment evaluate_shadow experiment plotting shadow
+            tools.batching tools.binary_solver tools.clifford tools.distributions
+            tools.estimator tools.majorana tools.noise tools.observable tools.state
+            tools.statevector tools.utils
+          )
+          for module in "${docs_modules[@]}"; do
+            griffe dump --search . --no-inspection --docstyle google \
+              "$module" > /dev/null
+          done
+
+      - name: Check API documentation and examples
+        run: python scripts/check_docs.py
+
+      - name: Build documentation
+        run: zensical build --strict

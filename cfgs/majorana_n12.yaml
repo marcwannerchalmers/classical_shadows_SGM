@@ -1,0 +1,92 @@
+defaults:
+  - _self_
+
+name: arrhenius_majorana_batched
+seed: 12345
+n: 12
+k: 2
+
+qubits:
+  values: ["${n}"]
+samples:
+  powers: {base: 2, start: 7, stop: 21}
+repetitions: 10
+
+state:
+  class: MajoranaState
+  name: Majorana_state
+
+observables:
+  init: majorana_rdm
+  order: ${k}
+
+batch:
+  states: 1
+  observables: 23
+  samples: 1024
+
+experiments:
+  - id: clifford_majorana
+    shadow_class: CliffordShadow
+    shadow_args: {simulator: statevector}
+    experiment_name: Clifford
+    path_prefix: results/CliffordMajorana_rdm2_nmax12_Nobs10902_reps10_N1048576_k2_bsState1_bsObs23_bsN1024
+    verbose: true
+  - id: pauli_majorana
+    shadow_class: PauliShadow
+    shadow_args: {simulator: statevector}
+    experiment_name: Pauli
+    path_prefix: results/PauliMajorana_rdm2_nmax12_Nobs10902_reps10_N1048576_k2_bsState1_bsObs23_bsN1024
+    verbose: true
+  - id: sgm_majorana_binomial
+    shadow_class: SGMShadow
+    shadow_args:
+      simulator: statevector
+      distribution: {name: binomial, q: mean_xy_support}
+    experiment_name: SGM binomial
+    path_prefix: results/SGMMajoranaBinom_rdm2_nmax12_Nobs10902_reps10_N1048576_k2_bsState1_bsObs23_bsN1024
+    verbose: true
+  - id: fermionic_gaussian
+    shadow_class: FermionicGaussianShadow
+    shadow_args: {simulator: statevector}
+    experiment_name: FGU
+    path_prefix: results/FGUMajorana_rdm2_nmax12_Nobs10902_reps10_N1048576_k2_bsState1_bsObs23_bsN1024
+    verbose: true
+  - id: sgm_majorana_binomial_optimized
+    shadow_class: SGMShadow
+    shadow_args:
+      simulator: statevector
+      distribution: {name: binomial, q: rdm_optim}
+    experiment_name: SGM optimal q
+    path_prefix: results/SGMMajoranaBinomOptim_rdm2_nmax12_Nobs10902_reps10_N1048576_k2_bsState1_bsObs23_bsN1024
+    verbose: true
+  - id: sgm_majorana_fixed_weight
+    shadow_class: SGMShadow
+    shadow_args:
+      simulator: statevector
+      distribution: {name: fixed_weight, weights: rdm_optim}
+    experiment_name: SGM optimal weights
+    path_prefix: results/SGMMajoranaFixedWeight_rdm2_nmax12_Nobs10902_reps10_N1048576_k2_bsState1_bsObs23_bsN1024
+    verbose: true
+
+plot:
+  function: plot_avg_var
+  path: plots/majorana_scaling_batched_n12_k2.pdf
+  x: N
+  xlog: true
+  ylog: true
+  metric: rmse
+  aggregation_batch_size: 16
+  progress: true
+  style:
+    font_sizes: {axes: 15, ticks: 15, legend: 14, legend_title: 14}
+    marker_size: 8
+    line_width: 2
+    legend_location: best
+    aspect_ratio: 1.2
+    x_tick_stride: 2
+
+hydra:
+  run: {dir: .}
+  output_subdir: null
+  job: {chdir: false}
