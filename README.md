@@ -296,6 +296,9 @@ experiments.
 
 ## Documentation
 
+The published documentation is available at
+[docs.sgm-shadows.com](https://docs.sgm-shadows.com/).
+
 Install the static documentation toolchain separately from the scientific
 runtime dependencies:
 
@@ -314,6 +317,9 @@ The site source is under `docs/`. API pages are rendered by
 mkdocstrings-python from Griffe's static source model, with Google-style
 docstrings and Python annotations as the source of signature types. The build
 does not import the runtime modules.
+
+See the [publishing guide](docs/publishing.md) for the GitHub Pages and DNS
+setup.
 
 ## License
 

@@ -1,6 +1,6 @@
 site_name: Classical shadows with SGM
 site_description: Simulation and evaluation of classical-shadow protocols.
-site_url: https://marcwannerchalmers.github.io/classical_shadows_SGM/
+site_url: https://docs.sgm-shadows.com/
 repo_url: https://github.com/marcwannerchalmers/classical_shadows_SGM
 repo_name: marcwannerchalmers/classical_shadows_SGM
 edit_uri: edit/main/docs/
@@ -29,6 +29,7 @@ nav:
       - Run an experiment: tutorials/run-experiment.md
   - API reference: reference/api.md
   - Documentation development: development.md
+  - Publishing: publishing.md
 
 plugins:
   - search
