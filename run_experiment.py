@@ -26,7 +26,7 @@ from tools.majorana import (
 )
 from tools.noise import depolarizing_noise
 from tools.observable import PauliObservable
-from tools.state import GHZType, HRState, State, GHZ_Klocal
+from tools.state import GHZType, GHZ_Klocal as _GHZ_Klocal, HRState, State
 
 
 SHADOW_CLASSES = {
@@ -168,7 +168,7 @@ def _observables(
 def _state_class(spec: Mapping[str, Any]):
     name = spec.get("class", "HRState")
     if name == "GHZ_Klocal":
-        return GHZ_Klocal(int(spec["locality"]))
+        return _GHZ_Klocal(int(spec["locality"]))
     try:
         return STATE_CLASSES[name]
     except KeyError as exc:

@@ -10,8 +10,6 @@ runtime modules.
     options:
       members: false
 
-::: run_experiment.GHZ_Klocal
-
 ::: run_experiment.parse_experiment_config
 
 ::: run_experiment.run_from_config
@@ -82,6 +80,8 @@ runtime modules.
 ::: tools.state.GHZType
     options:
       members: false
+
+::: tools.state.GHZ_Klocal
 
 ::: tools.majorana.MajoranaState
     options:
